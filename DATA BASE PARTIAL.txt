@@ -1,0 +1,35 @@
+*DATA BASE PARTIAL*
+1. Explain why posts are stored under each user. What are the drawbacks of querying all academic posts?
+	Each post is stored under each user because the posts depend on the users.  To send a post, you need a user, an IP address from 	which the post will be sent. If posts do not have a point of origin, they will not be sent. So, posts must be stored under each 	user. Also, that helps to keep the information safe and it’s easier for the user to consult their own posts.
+	The drawback of querying all academic posts is that it can be difficult because there are many subjects and it is a very general 	search, so there may be information irrelevant to the user. Also, it is a waste of time because if you search for something 	specific you waste time until you have found that information in the database.
+
+
+2. The previous query fails due to indexing:
+a. Explain why
+b. Define the required composite index
+c. Can the same index be reused for other filters?
+	The previous query fails due to it not being defined on the database, and the database must have that filter as an index because 	the search includes many filters, so it’s a complex query. 
+
+	For defining the required composite is necessary to define the field to filter and the order of this.
+	In this case, the index will be:
+		where("type", "==", "academic"),
+		orderBy("publishedAt", "asc"),
+		where("LikeNum",">",50),
+		orderBy("LikeNum", "asc"),
+
+	First, I define the field that will be equal, after the order in which I want to appear, and finally the limit or the 	characteristic in common.
+
+	No, the same index cannot be reused for other filters because each index has specific characteristics and order, so for each 	filter, it's necessary to create a new index. Unless the search that you want to do has the same filters as the first index (the 	index already declared on the database).
+
+
+3. Propose a data structure that allows fast access to trending posts as the app scales to thousands of users per community.
+	To propose a data structure that allows that, first I would create a new variable whose his name would be “createdAt” this 	variable does reference to the time which the post was created, and it would be obligatory. After that, I would define a new 	document in the database which will be manager by uploading this, and every time has a trending post this would be automatically 	updated. 
+	The structure would be:
+		/Communities/{communityId}/TrendingPosts/
+   		 postId_1: {
+        		referenceToPost: /Communities/{communityId}/Students/{userId}/Posts/{postId},
+        		LikeNum: 523,
+        		createdAt: timestamp,
+        		...
+    		}
+

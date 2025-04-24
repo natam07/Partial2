@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Firebase Web</title>
+</head>
+
+<body>
+    <a href="queries.html"> Query</a>
+    <div>
+        <h1>Connected to Firestore</h1>
+        <button id="loadDataBtn">Show all documents in console</button>
+    </div>
+
+    <div>
+        <h1>Add student to the database</h1>
+
+        <!--
+        <label for="communityId">Community Id:</label>
+        <input type="text" id="communityId" placeholder="Ej: San Buenaventura"><br><br>
+
+        <label for="userId">User Id</label>
+        <input type="text" id="userId" placeholder="Ej: San Buenaventura"><br><br>
+        -->
+        <label for="postId">ID Posts:</label>
+        <input type="number" id="postId" placeholder="Ej: 30003625"><br><br>
+
+        <label for="LikeNum">Número de likes:</label>
+        <input type="text" id="LikeNum" placeholder="Ej: Sergio"><br><br>
+
+        <label for="Publish">Published At:</label>
+        <input type="text" id="Publish" placeholder="Ej: Reyes"><br><br>
+
+        <label for="type">Type:</label>
+        <input type="text" id="type" placeholder="Ej: Profe"><br><br>
+
+        <label for="status">Status:</label>
+        <input type="text" id="status" placeholder="Ej: 18"><br><br>
+
+        <button id="addDocBtn">Add Post Infor</button>
+    </div>
+    <div>
+        <h1>Get Posts by id</h1>
+
+        <label for="getPostId">Posts id:</label>
+        <input type="text" id="getPostId" placeholder="Ej: 30003625"><br><br>
+
+        <button id="getDocBtn">Get post</button>
+    </div>
+
+    <script type="module">
+        import { FirestoreService } from './modules/firestore_service.js';
+
+        const communityId = "San Buenaventura";
+        const userId = "1000183924";
+        const firestore = new FirestoreService(`/Communities/${communityId}/Students/${userId}/Posts/`);
+        /*First, I created the function with all the datas and say which information is obligatory. 
+        Also, I put a message that confirm sucessful upload of data. And declared the communities and student*/
+        async function seedPosts(communityId, userId) {
+            const firestore = new FirestoreService(`/Communities/${communityId}/Students/${userId}/Posts/`);
+            const postId = document.getElementById("postId").value.trim();
+            const LikeNumValue = document.getElementById("LikeNum").value.trim();
+            const LikeNum = LikeNumValue ? parseInt(LikeNumValue) : null;
+            const publishedAt = document.getElementById("Publish").value.trim();
+            const type = document.getElementById("type").value.trim();
+            const status = document.getElementById("status").value.trim();
+
+            if (!postId || !type) {
+                alert("Fill in the required fields: Post ID and Type post.");
+                return;
+            }
+
+            const data = {
+                LikeNum: isNaN(LikeNum) ? null : LikeNum,
+                publishedAt,
+                type,
+                status
+            };
+
+            await firestore.PostDocument(postId, data);
+        }
+
+        /*Second, I declared the communityId and the userId whit the datas that are in the Firestore
+        And asign those datas in the functions seedPosts*/
+        document.getElementById("addDocBtn").addEventListener("click", async () => {
+            await seedPosts(communityId, userId);
+        });
+
+        /**/
+        document.getElementById("loadDataBtn").addEventListener("click", async () => {
+            const docs = await firestore.getAllDocuments();
+            console.log("Obtained Docs:", docs);
+        });
+
+        document.getElementById("getDocBtn").addEventListener("click", async () => {
+            const postId = document.getElementById("getPostId").value.trim();
+
+            if (!postId) {
+                alert("The posts id is needed");
+                return;
+            }
+            const doc = await firestore.getDocumentById(postId);
+            console.log(doc);
+        });
+    </script>
+</body>
+
+</html>
